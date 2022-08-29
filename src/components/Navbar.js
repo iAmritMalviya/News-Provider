@@ -3,7 +3,7 @@ import {
     Link
   } from "react-router-dom";
 
-const Navbar=()=> {
+const Navbar=(props)=> {
    
        
       
@@ -27,18 +27,28 @@ const Navbar=()=> {
                                 <li className="nav-item active"><Link className="nav-link" to="/technology">Technology</Link></li>         
                                
                         </ul>                      
+                   
+                    <div className="d-flex">
+                        <div className="mx-2 text-white" onClick={()=>{props.togglemode('in')}} style={{cursor:'pointer'}}>India</div>
+                        <div className="mx-2 text-white" onClick={()=>{props.togglemode('us')}} style={{cursor:'pointer'}}>US</div>
                     </div>
-                    <div className="dropleft">
-                        <button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&#127988;</button>
-                        <div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                            <li className="nav-item active"><Link className="dropdown-item" to="/in">India</Link></li>
-                           <li className="nav-item active"> <Link className="dropdown-item" to="/us">US</Link></li>
-                        </div>
                     </div>
+                   
  </nav>
             </>
         )
     }
-
+ 
 
 export default Navbar
+
+
+{/* <div className="dropleft">
+<button className="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">&#127988;</button>
+<div className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+<li className="nav-item active" onClick={props.togglemode()}><label >India</label></li>                                 
+ 
+</div>
+//    // onClick={()=>{props.togglemode('India')}}
+
+</div> */}

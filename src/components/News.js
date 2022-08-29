@@ -3,27 +3,45 @@ import Newsitem from './Newsitem'
 import Spinner from './Spinner';
 import PropTypes from 'prop-types'
 import InfiniteScroll from "react-infinite-scroll-component";
+import './button.css';
+// import BackToTop from "react-back-to-top";
 
 
-const News =(props) => {
+const News = (props) => {
 
-     const [articles, setArticles] = useState([])
-     const [loading, setLoading] = useState(true)
-     const [totalResults, setTotalResults] = useState(0)
-     const [page, setPage] = useState(1)
-     
-     const  capitalize =(word) =>{
-            return word[0].toUpperCase() + word.slice(1).toLowerCase();
-          }
-     
-        //   document.title = `${capitalize(props.category)} - News Provider`
 
-   
-         
-   const UpdatedNews = async() =>{
+
+    const capitalize = (word) => {
+        return word[0].toUpperCase() + word.slice(1).toLowerCase();
+    }
+    const [page, setPage] = useState(1)
+    const [articles, setArticles] = useState([])
+    const [totalResults, setTotalResults] = useState(0)
+    const [loading, setLoading] = useState(true)
+    const [isVisible, setIsVisible] = useState(false);
+    //  document.title = `${capitalize(props.category)} - News Provider`
+    const toggleVisibility = () => {
+        if (window.pageYOffset > 300) {
+            setIsVisible(true);
+        } else {
+            setIsVisible(false);
+        }
+    };
+    // Set the top cordinate to 0
+    // make scrolling smooth
+    const scrollToTop = () => {
+        window.scrollTo({
+            top: 0,
+            behavior: "smooth"
+        });
+    };
+
+
+
+    const UpdatedNews = async () => {
         props.setProgress(0)
         const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`
-        setLoading({loading:true})
+        setLoading(true)
         props.setProgress(50)
         let data = await fetch(url);
         let parsedData = await data.json();
@@ -31,71 +49,102 @@ const News =(props) => {
         setArticles(parsedData.articles)
         setTotalResults(parsedData.totalResults)
         setLoading(false)
+        // window.addEventListener("scroll", toggleVisibility);
+        props.setProgress(100)
 
         
-        // _isMounted && setState({
-        //     articles: parsedData.articles,
-        //     totalResults: parsedData.totalResults,
-        //     loading:false})           
-
-            props.setProgress(100)
     }
 
- 
-    
-   const fetchMoreData = async () =>
-    {
-      const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page}&pageSize=${props.pageSize}`
-      setPage(page + 1)
-      let data = await fetch(url);
-      
-      let parsedData = await data.json();        
-        setArticles(articles.concat(parsedData.articles));
-        setTotalResults(parsedData.totalResults);
-        setLoading(false);
-    }
+
+    // useEffect(() => {
+    //     UpdatedNews(); 
+    //      // eslint-disable-next-line
+    //having eroor of memory leaks
+    // }, [])
+
     useEffect(() => {
-      UpdatedNews();   
-    }, [])
-    
-  
-  
-        return (
-            <>
-            <h1 className="text-center" style={{margin: '25px 0px'}}>News Provider - Top {capitalize(props.category)} Headlines</h1>
-          {loading && <Spinner/>}
-           
-               <InfiniteScroll
-          dataLength={articles.length}
-          next={fetchMoreData}
-          hasMore={articles.length !== totalResults}
-          loader={<Spinner/>}
-        >
-            <div className="container my-3">
-               <div className="row">
-                    {articles.map((element)=>{
-                        return    <div className="col-md-4" key={element.url}>
-                                <Newsitem title={element.title?element.title.slice(0,35):""} description={element.description?element.description.slice(0,88):""} imageUrl={element.urlToImage} newsUrl={element.url} author={element.author} time={element.publishedAt} source={element.source.name}/>
-                            </div> 
-                    })}
-               </div>
-            </div>
-                    </InfiniteScroll>                 
-            
-            </>
-        )
-    }
-    News.defaultProps = {
-        country: 'in',
-        category: 'general',
-        pageSize: 6
-      }
+        window.addEventListener("scroll", toggleVisibility);
+        let abortController = new AbortController();
+        UpdatedNews();
+        // eslint-disable-next-line
+        // your async action is here  
+        // this is for memory leaks problem
+        return () => {
+            abortController.abort();
+        }
 
-      News.propTypes = {
-          category: PropTypes.string,
-          country: PropTypes.string,
-          pageSize: PropTypes.number
-      }
+
+
+    }, []);// eslint-disable-line react-hooks/exhaustive-deps
+
+    //         const [value, setValue] = useState('checking value...');  this is also a method 
+    // useEffect(() => {
+    // let isMounted = true;
+    // fetchValue().then(() => {
+    //       if(isMounted ){
+    //       setValue("done!"); // no more error
+    //       } 
+    //     });
+    //    return () => {
+    //     isMounted = false;
+    //     };
+    // }, []);
+
+    const fetchMoreData = async () => {
+        setPage(page + 1)
+        const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=${props.apiKey}&page=${page + 1}&pageSize=${props.pageSize}`
+        let data = await fetch(url);
+        let parsedData = await data.json();
+        setArticles(articles.concat(parsedData.articles))
+        setTotalResults(parsedData.totalResults)
+    }
+
+    return (
+        <>
+            <h1 className="text-center" style={{ margin: '25px 0px' }}>News Provider - Top {capitalize(props.category)} Headlines</h1>
+            {loading && <Spinner />}
+
+            <InfiniteScroll
+                dataLength={articles.length}
+                next={fetchMoreData}
+                hasMore={articles.length !== totalResults}
+                loader={<Spinner />}
+            >
+                <div className="container my-3">
+                    <div className="row">
+                        {articles.map((element) => {
+                            return <div className="col-md-4" key={element.url}>
+                                <Newsitem title={element.title ? element.title.slice(0, 35) : ""} description={element.description ? element.description.slice(0, 88) : ""} imageUrl={element.urlToImage} newsUrl={element.url} author={element.author} time={element.publishedAt} source={element.source.name} />
+                            </div>
+                        })}
+                    </div>
+                </div>
+                <div className="scroll-to-top">
+                    {isVisible &&
+                        <div onClick={scrollToTop}>
+                            <img src="https://img.icons8.com/color/48/000000/double-up--v2.png" alt='Idhar ko click kar' />
+                        </div>}
+                </div>
+            </InfiniteScroll>
+
+
+
+
+
+        </>
+    )
+}
+News.defaultProps = {
+    country: 'in',
+    category: 'general',
+    pageSize: 6
+}
+
+News.propTypes = {
+    category: PropTypes.string,
+    country: PropTypes.string,
+    pageSize: PropTypes.number
+}
 
 
 export default News

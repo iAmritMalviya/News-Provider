@@ -5,18 +5,15 @@ import React from 'react'
   
     return (
       <>
-          
-        
-
-    <main role="main">
+         <main role="main">
 
       <section className="jumbotron text-center">
         <div className="container">
           <h1 className="jumbotron-heading">News Provider</h1>
-          <p className="lead text-muted">Live NEWS from diffrent region in diffrent category.</p>
+          <p className="lead text-muted">Live NEWS from different region in diffrent category.</p>
           <p>
-            <a href="/" className="btn btn-primary my-2">Main call to action</a>
-            <a href="/" className="btn btn-secondary my-2">Secondary action</a>
+            <a href="/" className="btn btn-primary my-2 mx-2">Main call to action</a>
+            <a href="/" className="btn btn-secondary my-2 mx-2">Secondary action</a>
           </p>
         </div>
       </section>
